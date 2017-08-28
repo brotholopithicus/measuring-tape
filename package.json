@@ -1,0 +1,18 @@
+{
+  "name": "measuring-tape",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "webpack-dev-server --open --config config/webpack.config.dev.js --cert '/Users/jamesjarvis/.localhost-ssl/cert.pem' --key '/Users/jamesjarvis/.localhost-ssl/key.pem'",
+    "build": "webpack --config config/webpack.config.prod.js"
+  },
+  "devDependencies": {
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.7.1",
+    "webpack-merge": "^4.1.0"
+  },
+  "dependencies": {
+    "express": "^4.15.4"
+  }
+}
