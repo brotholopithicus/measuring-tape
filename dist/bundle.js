@@ -89,6 +89,7 @@ var setHeadingButton = document.querySelector('#setHeadingButton');
 var distanceRemainingAlert = document.querySelector('#distanceRemainingAlert');
 var distanceRemainingWithUnits = document.querySelector('#distanceRemainingWithUnits');
 
+var altitude = document.querySelector('#altitude');
 var startDiv = document.querySelector('#start');
 var endDiv = document.querySelector('#end');
 var currentDiv = document.querySelector('#current');
@@ -140,7 +141,10 @@ function onSubmitClick(e) {
   var locationOptions = { enableHighAccuracy: true, maximumAge: 1000 };
   distanceSavedWithUnits.textContent = distance + ' ' + selectedUnit;
   distanceSavedAlert.style.display = 'block';
-  navigator.geolocation.getCurrentPosition(locationSuccess, locationFailure, locationOptions);
+  var getCurrentPosition = function getCurrentPosition() {
+    return navigator.geolocation.getCurrentPosition(locationSuccess, locationFailure, locationOptions);
+  };
+  getCurrentPosition();
   outputDiv.style.display = 'block';
 
   function locationSuccess(position) {
@@ -159,10 +163,17 @@ function onSubmitClick(e) {
     currentDiv.textContent = distance + ' ' + selectedUnit;
     distanceRemainingAlert.style.display = 'block';
     distanceRemainingWithUnits.textContent = distance + ' ' + selectedUnit;
-    navigator.geolocation.watchPosition(locationUpdate, locationUpdateFailure, locationOptions);
+
+    var watchPosition = function watchPosition() {
+      return navigator.geolocation.watchPosition(locationUpdate, locationUpdateFailure, locationOptions);
+    };
+    watchPosition();
 
     function locationUpdate(position) {
+      console.log({ update: position });
+      if (position.coords.accuracy > 10) return;
       var currentDistance = _haversine2.default.distance(position.coords, targetCoordinates, { unit: selectedUnit });
+      altitude.textContent = position.coords.altitude + ' meters';
       currentDiv.textContent = currentDistance.toFixed(2) + ' ' + selectedUnit;
       distanceRemainingWithUnits.textContent = currentDistance.toFixed(0) + ' ' + selectedUnit;
     }

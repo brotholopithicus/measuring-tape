@@ -13,6 +13,7 @@ const setHeadingButton = document.querySelector('#setHeadingButton');
 const distanceRemainingAlert = document.querySelector('#distanceRemainingAlert');
 const distanceRemainingWithUnits = document.querySelector('#distanceRemainingWithUnits');
 
+const altitude = document.querySelector('#altitude');
 const startDiv = document.querySelector('#start');
 const endDiv = document.querySelector('#end');
 const currentDiv = document.querySelector('#current');
@@ -64,7 +65,8 @@ function onSubmitClick(e) {
   const locationOptions = { enableHighAccuracy: true, maximumAge: 1000 };
   distanceSavedWithUnits.textContent = `${distance} ${selectedUnit}`;
   distanceSavedAlert.style.display = 'block';
-  navigator.geolocation.getCurrentPosition(locationSuccess, locationFailure, locationOptions);
+  const getCurrentPosition = () => navigator.geolocation.getCurrentPosition(locationSuccess, locationFailure, locationOptions);
+  getCurrentPosition();
   outputDiv.style.display = 'block';
 
   function locationSuccess(position) {
@@ -80,10 +82,15 @@ function onSubmitClick(e) {
     currentDiv.textContent = `${distance} ${selectedUnit}`;
     distanceRemainingAlert.style.display = 'block';
     distanceRemainingWithUnits.textContent = `${distance} ${selectedUnit}`;
-    navigator.geolocation.watchPosition(locationUpdate, locationUpdateFailure, locationOptions);
+
+    const watchPosition = () => navigator.geolocation.watchPosition(locationUpdate, locationUpdateFailure, locationOptions);
+    watchPosition();
 
     function locationUpdate(position) {
+      console.log({ update: position });
+      if (position.coords.accuracy > 10) return;
       const currentDistance = Haversine.distance(position.coords, targetCoordinates, { unit: selectedUnit });
+      altitude.textContent = `${position.coords.altitude} meters`;
       currentDiv.textContent = `${currentDistance.toFixed(2)} ${selectedUnit}`;
       distanceRemainingWithUnits.textContent = `${currentDistance.toFixed(0)} ${selectedUnit}`;
 
