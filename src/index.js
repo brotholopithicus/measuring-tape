@@ -10,6 +10,9 @@ const currentHeadingSavedAs = document.querySelector('#currentHeadingSavedAs');
 
 const setHeadingButton = document.querySelector('#setHeadingButton');
 
+const distanceRemainingAlert = document.querySelector('#distanceRemainingAlert');
+const distanceRemainingWithUnits = document.querySelector('#distanceRemainingWithUnits');
+
 const startDiv = document.querySelector('#start');
 const endDiv = document.querySelector('#end');
 const currentDiv = document.querySelector('#current');
@@ -26,10 +29,23 @@ const setDistanceInput = document.querySelector('#set-distance-input');
 const outputDiv = document.querySelector('#output');
 
 submitButton.addEventListener('click', onSubmitClick);
-
+distanceInput.addEventListener('change', onDistanceKeyDown);
+distanceInput.addEventListener('keydown', onDistanceKeyDown);
 setHeadingButton.addEventListener('click', onSetHeadingClick);
 
 const setDistanceContainer = document.querySelector('#set-distance-container');
+
+function onDistanceKeyDown(e) {
+  const num = e.target.value;
+  if (num.length && !isNaN(num)) {
+    submitButton.disabled = false;
+    if (e.keyCode === 13) {
+      onSubmitClick(e);
+    }
+  } else {
+    submitButton.disabled = true;
+  }
+}
 
 function onSetHeadingClick(e) {
   e.preventDefault();
@@ -62,12 +78,14 @@ function onSubmitClick(e) {
     startDiv.textContent = `${decimalToDMS(latitude, 'lat')}, ${decimalToDMS(longitude, 'lon')}`;
     endDiv.textContent = `${decimalToDMS(targetCoordinates.latitude, 'lat')}, ${decimalToDMS(targetCoordinates.longitude, 'lon')}`;
     currentDiv.textContent = `${distance} ${selectedUnit}`;
-
+    distanceRemainingAlert.style.display = 'block';
+    distanceRemainingWithUnits.textContent = `${distance} ${selectedUnit}`;
     navigator.geolocation.watchPosition(locationUpdate, locationUpdateFailure, locationOptions);
 
     function locationUpdate(position) {
       const currentDistance = Haversine.distance(position.coords, targetCoordinates, { unit: selectedUnit });
       currentDiv.textContent = `${currentDistance.toFixed(2)} ${selectedUnit}`;
+      distanceRemainingWithUnits.textContent = `${currentDistance.toFixed(0)} ${selectedUnit}`;
 
     }
 

@@ -86,6 +86,9 @@ var currentHeadingSavedAs = document.querySelector('#currentHeadingSavedAs');
 
 var setHeadingButton = document.querySelector('#setHeadingButton');
 
+var distanceRemainingAlert = document.querySelector('#distanceRemainingAlert');
+var distanceRemainingWithUnits = document.querySelector('#distanceRemainingWithUnits');
+
 var startDiv = document.querySelector('#start');
 var endDiv = document.querySelector('#end');
 var currentDiv = document.querySelector('#current');
@@ -102,10 +105,23 @@ var setDistanceInput = document.querySelector('#set-distance-input');
 var outputDiv = document.querySelector('#output');
 
 submitButton.addEventListener('click', onSubmitClick);
-
+distanceInput.addEventListener('change', onDistanceKeyDown);
+distanceInput.addEventListener('keydown', onDistanceKeyDown);
 setHeadingButton.addEventListener('click', onSetHeadingClick);
 
 var setDistanceContainer = document.querySelector('#set-distance-container');
+
+function onDistanceKeyDown(e) {
+  var num = e.target.value;
+  if (num.length && !isNaN(num)) {
+    submitButton.disabled = false;
+    if (e.keyCode === 13) {
+      onSubmitClick(e);
+    }
+  } else {
+    submitButton.disabled = true;
+  }
+}
 
 function onSetHeadingClick(e) {
   e.preventDefault();
@@ -141,12 +157,14 @@ function onSubmitClick(e) {
     startDiv.textContent = decimalToDMS(latitude, 'lat') + ', ' + decimalToDMS(longitude, 'lon');
     endDiv.textContent = decimalToDMS(targetCoordinates.latitude, 'lat') + ', ' + decimalToDMS(targetCoordinates.longitude, 'lon');
     currentDiv.textContent = distance + ' ' + selectedUnit;
-
+    distanceRemainingAlert.style.display = 'block';
+    distanceRemainingWithUnits.textContent = distance + ' ' + selectedUnit;
     navigator.geolocation.watchPosition(locationUpdate, locationUpdateFailure, locationOptions);
 
     function locationUpdate(position) {
       var currentDistance = _haversine2.default.distance(position.coords, targetCoordinates, { unit: selectedUnit });
       currentDiv.textContent = currentDistance.toFixed(2) + ' ' + selectedUnit;
+      distanceRemainingWithUnits.textContent = currentDistance.toFixed(0) + ' ' + selectedUnit;
     }
 
     function locationUpdateFailure(error) {
